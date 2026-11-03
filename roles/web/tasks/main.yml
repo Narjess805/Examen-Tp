@@ -1,0 +1,58 @@
+---
+- name: Installer Nginx, PHP-FPM et php-mysql
+  apt:
+    name:
+      - nginx
+      - php-fpm
+      - php-mysql
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Demarrer et activer PHP-FPM
+  service:
+    name: php7.4-fpm
+    state: started
+    enabled: true
+
+- name: Creer le repertoire racine de l'application
+  file:
+    path: /var/www/app
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+
+- name: Deployer index.php depuis le template
+  template:
+    src: index.php.j2
+    dest: /var/www/app/index.php
+    owner: www-data
+    group: www-data
+    mode: "0644"
+
+- name: Deployer le VirtualHost Nginx
+  template:
+    src: nginx_site.j2
+    dest: /etc/nginx/sites-available/app
+    mode: "0644"
+  notify: Restart nginx
+
+- name: Activer le site
+  file:
+    src: /etc/nginx/sites-available/app
+    dest: /etc/nginx/sites-enabled/app
+    state: link
+  notify: Restart nginx
+
+- name: Desactiver le site par defaut
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Restart nginx
+
+- name: Demarrer et activer Nginx
+  service:
+    name: nginx
+    state: started
+    enabled: true

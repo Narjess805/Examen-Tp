@@ -1,0 +1,12 @@
+---
+- name: Deploiement du serveur de base de donnees
+  hosts: dbservers
+  become: true
+  roles:
+    - db
+
+- name: Deploiement des serveurs web
+  hosts: webservers
+  become: true
+  roles:
+    - web

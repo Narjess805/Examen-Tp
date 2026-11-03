@@ -1,0 +1,16 @@
+<?php
+$conn = @new mysqli('{{ db_host }}', '{{ db_user }}', '{{ db_password }}', '{{ db_name }}');
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>{{ inventory_hostname }}</title></head>
+<body>
+  <h1>Serveur Web : {{ inventory_hostname }}</h1>
+  <p>Adresse IP du serveur : <strong>{{ ansible_host }}</strong></p>
+  <?php if ($conn->connect_errno): ?>
+    <p style="color:red">Echec de connexion a MySQL : <?= htmlspecialchars($conn->connect_error) ?></p>
+  <?php else: ?>
+    <p style="color:green">Connexion reussie a la base <strong>{{ db_name }}</strong> sur {{ db_host }}</p>
+  <?php endif; ?>
+</body>
+</html>
